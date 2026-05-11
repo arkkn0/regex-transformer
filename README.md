@@ -297,13 +297,13 @@ Allowed flag values: `IGNORECASE`, `MULTILINE`, `DOTALL`, `VERBOSE`.
 
 ## 8. Deployment
 
-This repository is ready to run locally. Before final submission, replace the entries below with live URLs if the assignment requires a deployed demo.
+The application is deployed publicly for end-to-end review:
 
 | Resource | URL |
 | --- | --- |
-| Live frontend | _Local-only; see [Local development](#5-local-development)_ |
-| Live backend (API base) | _Local-only; see [Local development](#5-local-development)_ |
-| Hosting provider notes | _Add provider names before final submission if deployed_ |
+| Live frontend | https://regex-transformer.vercel.app/ |
+| Live backend (API base) | https://regex-transformer-backend.onrender.com |
+| Hosting provider notes | Frontend hosted on Vercel; backend hosted on Render with `OPENAI_API_KEY` configured for natural-language regex generation. |
 
 ### Backend deployment
 
@@ -405,11 +405,11 @@ AGENTS.md
 
 **Pre-submission checklist**
 
-- [ ] If required by the assignment, replace the deployment URLs in section 8 with real, publicly reachable values.
+- [x] If required by the assignment, replace the deployment URLs in section 8 with real, publicly reachable values.
 - [ ] If required by the assignment, replace the demo-video URL in section 9.
 - [ ] Ensure the submitted repo/archive does not include `.env`, `backend/.venv`, `backend/db.sqlite3`, `frontend/node_modules`, `frontend/dist`, or `__pycache__`.
 - [ ] In the deployed backend: `DJANGO_DEBUG=false`, strong `DJANGO_SECRET_KEY`, correct `DJANGO_ALLOWED_HOSTS` and `CORS_ALLOWED_ORIGINS`.
-- [ ] Configure `OPENAI_API_KEY` on the live backend if the reviewer should test natural-language generation.
+- [x] Configure `OPENAI_API_KEY` on the live backend if the reviewer should test natural-language generation.
 - [ ] Build the frontend with `VITE_API_BASE_URL` pointing to the deployed backend origin.
 - [ ] HTTPS for both frontend and backend.
 - [ ] Backend run as a single process, or in-memory store replaced with shared storage.
