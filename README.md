@@ -363,7 +363,7 @@ The walkthrough should be 60-90 seconds and use the live deployment plus [`examp
 
 | Resource | URL |
 | --- | --- |
-| Walkthrough video | _Placeholder: replace this with the final Loom, Google Drive, or unlisted YouTube URL before submission._ |
+| Walkthrough video | https://drive.google.com/file/d/1eDuAIg-FNdT93IVsdMKf_DC5QlUYhyFP/view?usp=sharing |
 | Demo screenshot | _Placeholder: after recording, replace this note with a screenshot of the transformed preview showing `REDACTED` email values._ |
 
 ### Demo script
@@ -462,7 +462,7 @@ AGENTS.md
 **Pre-submission checklist**
 
 - [x] If required by the assignment, replace the deployment URLs in section 8 with real, publicly reachable values.
-- [ ] If required by the assignment, replace the demo-video URL in section 9.
+- [x] If required by the assignment, replace the demo-video URL in section 9.
 - [ ] Ensure the submitted repo/archive does not include `.env`, `backend/.venv`, `backend/db.sqlite3`, `frontend/node_modules`, `frontend/dist`, or `__pycache__`.
 - [ ] In the deployed backend: `DJANGO_DEBUG=false`, strong `DJANGO_SECRET_KEY`, correct `DJANGO_ALLOWED_HOSTS` and `CORS_ALLOWED_ORIGINS`.
 - [x] Configure `OPENAI_API_KEY` on the live backend if the reviewer should test natural-language generation.
