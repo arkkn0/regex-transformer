@@ -21,6 +21,10 @@ If you do not have an OpenAI-compatible API key, you can still evaluate upload, 
 \b[\w.%+-]+@[\w.-]+\.[A-Za-z]{2,}\b
 ```
 
+## Demo video
+
+Watch the 60-90 second walkthrough: https://drive.google.com/file/d/1eDuAIg-FNdT93IVsdMKf_DC5QlUYhyFP/view?usp=sharing
+
 ## Quick evaluation
 
 The fastest way to evaluate the deployed app is:
@@ -357,13 +361,13 @@ $env:VITE_API_BASE_URL="https://your-backend-host.example"
 npm run build
 ```
 
-## 9. Demo video
+## 9. Demo notes
 
-The walkthrough should be 60-90 seconds and use the live deployment plus [`examples/sample_emails.csv`](examples/sample_emails.csv).
+The recorded walkthrough uses the live deployment plus [`examples/sample_emails.csv`](examples/sample_emails.csv).
 
 | Resource | URL |
 | --- | --- |
-| Walkthrough video | https://drive.google.com/file/d/1eDuAIg-FNdT93IVsdMKf_DC5QlUYhyFP/view?usp=sharing |
+| Walkthrough video | See [Demo video](#demo-video). |
 | Demo screenshot | _Placeholder: after recording, replace this note with a screenshot of the transformed preview showing `REDACTED` email values._ |
 
 ### Demo script
