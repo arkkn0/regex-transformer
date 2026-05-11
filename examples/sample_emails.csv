@@ -1,0 +1,5 @@
+ID,Name,Email,Notes
+1,John Doe,john.doe@example.com,Customer asked for newsletter updates.
+2,Jane Smith,jane_smith@domain.com,Follow up next week.
+3,Alice Brown,alice.brown@website.org,VIP account.
+4,Bob Lee,bob.lee+sales@example.co,Formula-like note should export safely.
