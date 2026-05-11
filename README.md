@@ -21,6 +21,21 @@ If you do not have an OpenAI-compatible API key, you can still evaluate upload, 
 \b[\w.%+-]+@[\w.-]+\.[A-Za-z]{2,}\b
 ```
 
+## Quick evaluation
+
+The fastest way to evaluate the deployed app is:
+
+1. Open the live frontend: https://regex-transformer.vercel.app/.
+2. Upload [`examples/sample_emails.csv`](examples/sample_emails.csv).
+3. Select the `Email` column.
+4. Enter `Find email addresses` as the natural-language pattern request.
+5. Enter `REDACTED` as the replacement value.
+6. Click `Generate pattern`; the app should show an LLM-generated regex, a short explanation, and sample matches from the uploaded file.
+7. Click `Apply transformation`; the preview should show every email replaced with `REDACTED`.
+8. Download the CSV and confirm the `Email` column contains only `REDACTED` values.
+
+Expected result: the reviewer can verify upload, LLM regex generation, server-side sample matching, literal replacement, transformed preview, and CSV download in under five minutes.
+
 ## Take-home checklist
 
 | Requirement | Implementation |
@@ -344,11 +359,52 @@ npm run build
 
 ## 9. Demo video
 
-Add a short walkthrough link here before final submission if the assignment requests a video. The walkthrough should run through the [Quick demo](#quick-demo) against either the live deployment or the local app.
+The walkthrough should be 60-90 seconds and use the live deployment plus [`examples/sample_emails.csv`](examples/sample_emails.csv).
 
 | Resource | URL |
 | --- | --- |
-| Walkthrough video | _Not included unless requested by the assignment_ |
+| Walkthrough video | _Placeholder: replace this with the final Loom, Google Drive, or unlisted YouTube URL before submission._ |
+| Demo screenshot | _Placeholder: after recording, replace this note with a screenshot of the transformed preview showing `REDACTED` email values._ |
+
+### Demo script
+
+> Hi, this is a quick demo of the Regex Pattern Matching and Replacement app. It is a Django and React application that lets a user upload tabular data, describe a text pattern in natural language, preview real matches, apply a replacement, and download the transformed CSV.
+>
+> I will start by uploading the sample email CSV. The backend validates and stores the file in memory, then the frontend shows the detected columns and a preview of the uploaded rows.
+>
+> Next, I select the Email column and ask the app to find email addresses. The backend sends a capped prompt to an OpenAI-compatible model and receives a regex pattern, explanation, and warnings. Importantly, the sample matches shown here are computed by the backend from the uploaded data, not invented by the model.
+>
+> Now I enter REDACTED as the replacement value and apply the transformation. The server re-validates the regex, performs a literal replacement on the selected column, and returns a side-by-side preview of the original and transformed data.
+>
+> Finally, I download the transformed CSV. The Email column has been replaced with REDACTED, while the rest of the data is preserved. The implementation also includes bounded in-memory storage, regex validation, cell-size limits, and CSV formula-prefix escaping for safer exports.
+
+### Recording flow
+
+1. Open https://regex-transformer.vercel.app/.
+   - The page should show the upload area and transformation workflow.
+2. Click the file upload control.
+   - Select `examples/sample_emails.csv` from this repository.
+   - The page should show columns including `ID`, `Name`, `Email`, and `Notes`, plus a preview table.
+3. Select `Email` as the target column.
+   - The transformation panel should show the selected column context.
+4. Type `Find email addresses` into the natural-language pattern input.
+   - Keep the wording short so the reviewer can read it on screen.
+5. Type `REDACTED` into the replacement input.
+   - The replacement field should show the exact text that will be inserted.
+6. Click `Generate pattern`.
+   - The page should show a generated regex, explanation, and sample matches such as `john.doe@example.com`.
+7. Click `Apply transformation`.
+   - The page should show match/change counts and a transformed preview where the `Email` values are `REDACTED`.
+8. Click the download button.
+   - Open or briefly show the downloaded CSV if time allows; the `Email` column should contain `REDACTED`.
+
+### Recording notes
+
+- Record only the browser window unless you need to show the downloaded CSV.
+- Keep the browser zoom at 100% or 110% so the preview table and generated regex are readable.
+- Do not show Render, Vercel, GitHub settings, terminal windows, or any API keys.
+- If Render has been idle, open the live frontend once before recording and run a quick upload/apply test so the backend is awake.
+- If the LLM call is slow, pause briefly after clicking `Generate pattern` and continue narration once the regex appears.
 
 ## 10. Trade-offs and design decisions
 
