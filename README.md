@@ -244,7 +244,7 @@ npm run build
 
 ## 6. Environment variables
 
-For local development, variables are loaded from a single `.env` file at the **repository root**. The Vite config sets `envDir: '..'`, so both Django (`backend/config/settings.py`) and Vite read from the same file. Every variable below is defined in [`.env.example`](.env.example), and production placeholders are provided in [`.env.production.example`](.env.production.example).
+For local development, variables are loaded from a single `.env` file at the **repository root**. The Vite config sets `envDir: '..'`, so both Django (`backend/config/settings.py`) and Vite read from the same file. Every variable below is defined in [`.env.example`](.env.example), and production template values are provided in [`.env.production.example`](.env.production.example).
 
 | Variable | Required | Default | Purpose |
 | --- | --- | --- | --- |
@@ -351,66 +351,17 @@ For split frontend/backend hosting, `VITE_API_BASE_URL` is required at build tim
 ```bash
 cd frontend
 npm ci
-VITE_API_BASE_URL=https://your-backend-host.example npm run build
+VITE_API_BASE_URL=https://regex-transformer-backend.onrender.com npm run build
 ```
 
 Deploy the generated `frontend/dist` directory. On Windows PowerShell, set the variable before the build command:
 
 ```powershell
-$env:VITE_API_BASE_URL="https://your-backend-host.example"
+$env:VITE_API_BASE_URL="https://regex-transformer-backend.onrender.com"
 npm run build
 ```
 
-## 9. Demo notes
-
-The recorded walkthrough uses the live deployment plus [`examples/sample_emails.csv`](examples/sample_emails.csv).
-
-| Resource | URL |
-| --- | --- |
-| Walkthrough video | See [Demo video](#demo-video). |
-| Demo screenshot | _Placeholder: after recording, replace this note with a screenshot of the transformed preview showing `REDACTED` email values._ |
-
-### Demo script
-
-> Hi, this is a quick demo of the Regex Pattern Matching and Replacement app. It is a Django and React application that lets a user upload tabular data, describe a text pattern in natural language, preview real matches, apply a replacement, and download the transformed CSV.
->
-> I will start by uploading the sample email CSV. The backend validates and stores the file in memory, then the frontend shows the detected columns and a preview of the uploaded rows.
->
-> Next, I select the Email column and ask the app to find email addresses. The backend sends a capped prompt to an OpenAI-compatible model and receives a regex pattern, explanation, and warnings. Importantly, the sample matches shown here are computed by the backend from the uploaded data, not invented by the model.
->
-> Now I enter REDACTED as the replacement value and apply the transformation. The server re-validates the regex, performs a literal replacement on the selected column, and returns a side-by-side preview of the original and transformed data.
->
-> Finally, I download the transformed CSV. The Email column has been replaced with REDACTED, while the rest of the data is preserved. The implementation also includes bounded in-memory storage, regex validation, cell-size limits, and CSV formula-prefix escaping for safer exports.
-
-### Recording flow
-
-1. Open https://regex-transformer.vercel.app/.
-   - The page should show the upload area and transformation workflow.
-2. Click the file upload control.
-   - Select `examples/sample_emails.csv` from this repository.
-   - The page should show columns including `ID`, `Name`, `Email`, and `Notes`, plus a preview table.
-3. Select `Email` as the target column.
-   - The transformation panel should show the selected column context.
-4. Type `Find email addresses` into the natural-language pattern input.
-   - Keep the wording short so the reviewer can read it on screen.
-5. Type `REDACTED` into the replacement input.
-   - The replacement field should show the exact text that will be inserted.
-6. Click `Generate pattern`.
-   - The page should show a generated regex, explanation, and sample matches such as `john.doe@example.com`.
-7. Click `Apply transformation`.
-   - The page should show match/change counts and a transformed preview where the `Email` values are `REDACTED`.
-8. Click the download button.
-   - Open or briefly show the downloaded CSV if time allows; the `Email` column should contain `REDACTED`.
-
-### Recording notes
-
-- Record only the browser window unless you need to show the downloaded CSV.
-- Keep the browser zoom at 100% or 110% so the preview table and generated regex are readable.
-- Do not show Render, Vercel, GitHub settings, terminal windows, or any API keys.
-- If Render has been idle, open the live frontend once before recording and run a quick upload/apply test so the backend is awake.
-- If the LLM call is slow, pause briefly after clicking `Generate pattern` and continue narration once the regex appears.
-
-## 10. Trade-offs and design decisions
+## 9. Trade-offs and design decisions
 
 - **In-memory store over a database.** Uploaded data is held in a bounded `OrderedDict` keyed by UUID, with TTL eviction and a maximum item count. This keeps the take-home easy to run locally and cheap to deploy while making the production limitation explicit: it is single-process only, and shared object storage would be the next step before scaling out.
 - **LLM produces regex only; data work happens server-side.** The model returns a JSON object with just `regex_pattern`, `explanation`, and `warnings`. Sample matches and replacements are computed locally against the stored DataFrame, so the model is not trusted to edit user data or produce exported content.
@@ -422,7 +373,7 @@ The recorded walkthrough uses the live deployment plus [`examples/sample_emails.
 - **Two-step generate / apply UX.** Users see, and can edit, the regex and review server-computed sample matches before committing to a full-table transformation. Applying again after an edit is cheap.
 - **Same `.env` for backend and frontend.** Vite is configured with `envDir: '..'` so both processes read variables from the repository-root `.env`. This avoids two-source-of-truth configuration drift in a small project.
 
-## 11. Limitations
+## 10. Limitations
 
 - In-memory storage is **single-process only**. Datasets and exports are lost on restart and not shared between Django workers.
 - No authentication, rate limiting, or per-user quotas. Anyone with access to the deployed origin can use the API up to the configured size and item caps.
@@ -432,7 +383,7 @@ The recorded walkthrough uses the live deployment plus [`examples/sample_emails.
 - Sample matches are computed by scanning at most `MAX_SAMPLE_SCAN_ROWS` rows (default 250). For very sparse columns, no sample match may be shown even though `apply` will still find matches across the full file.
 - The example dataset includes a single small CSV (`examples/sample_emails.csv`). No XLSX example is bundled.
 
-## 12. Appendix
+## 11. Appendix
 
 **Project structure**
 
@@ -466,11 +417,11 @@ AGENTS.md
 **Pre-submission checklist**
 
 - [x] If required by the assignment, replace the deployment URLs in section 8 with real, publicly reachable values.
-- [x] If required by the assignment, replace the demo-video URL in section 9.
-- [ ] Ensure the submitted repo/archive does not include `.env`, `backend/.venv`, `backend/db.sqlite3`, `frontend/node_modules`, `frontend/dist`, or `__pycache__`.
-- [ ] In the deployed backend: `DJANGO_DEBUG=false`, strong `DJANGO_SECRET_KEY`, correct `DJANGO_ALLOWED_HOSTS` and `CORS_ALLOWED_ORIGINS`.
+- [x] If required by the assignment, add the demo-video URL near the top of this README.
+- [x] Ensure the submitted repo/archive does not include `.env`, `backend/.venv`, `backend/db.sqlite3`, `frontend/node_modules`, `frontend/dist`, or `__pycache__`.
+- [x] In the deployed backend: `DJANGO_DEBUG=false`, strong `DJANGO_SECRET_KEY`, correct `DJANGO_ALLOWED_HOSTS` and `CORS_ALLOWED_ORIGINS`.
 - [x] Configure `OPENAI_API_KEY` on the live backend if the reviewer should test natural-language generation.
-- [ ] Build the frontend with `VITE_API_BASE_URL` pointing to the deployed backend origin.
-- [ ] HTTPS for both frontend and backend.
-- [ ] Backend run as a single process, or in-memory store replaced with shared storage.
-- [ ] `python manage.py test`, `npm run lint`, and `npm run build` pass on the submission commit.
+- [x] Build the frontend with `VITE_API_BASE_URL` pointing to the deployed backend origin.
+- [x] HTTPS for both frontend and backend.
+- [x] Backend run as a single process, or in-memory store replaced with shared storage.
+- [x] `python manage.py test`, `npm run lint`, and `npm run build` pass on the submission commit.
