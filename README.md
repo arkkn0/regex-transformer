@@ -1,6 +1,6 @@
 # Regex Pattern Matching and Replacement
 
-A Django + React take-home that lets a user upload a CSV or XLSX, describe a text pattern in natural language, generate a Python `re` pattern with an LLM, preview real matches from the uploaded data, apply a literal replacement to a single column, and download the transformed table as CSV.
+A Django + React that lets a user upload a CSV or XLSX, describe a text pattern in natural language, generate a Python `re` pattern with an LLM, preview real matches from the uploaded data, apply a literal replacement to a single column, and download the transformed table as CSV.
 
 The implementation keeps the scope small while still showing production-oriented habits: clean module boundaries, validated inputs, bounded resources, and an explicit safety posture around regex execution, LLM output, and CSV export. Sample matches are computed from the uploaded file, not invented by the model.
 
