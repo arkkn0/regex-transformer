@@ -363,7 +363,7 @@ npm run build
 
 ## 9. Trade-offs and design decisions
 
-- **In-memory store over a database.** Uploaded data is held in a bounded `OrderedDict` keyed by UUID, with TTL eviction and a maximum item count. This keeps the take-home easy to run locally and cheap to deploy while making the production limitation explicit: it is single-process only, and shared object storage would be the next step before scaling out.
+- **In-memory store over a database.** Uploaded data is held in a bounded `OrderedDict` keyed by UUID, with TTL eviction and a maximum item count. This keeps it easy to run locally and cheap to deploy while making the production limitation explicit: it is single-process only, and shared object storage would be the next step before scaling out.
 - **LLM produces regex only; data work happens server-side.** The model returns a JSON object with just `regex_pattern`, `explanation`, and `warnings`. Sample matches and replacements are computed locally against the stored DataFrame, so the model is not trusted to edit user data or produce exported content.
 - **Python `re` for portability.** Standard-library regex keeps the deployment surface small. To compensate, dangerous patterns (nested quantifiers, empty alternations) are rejected up front, and pattern/replacement length and per-cell length are capped. A timeout-capable engine in an isolated worker would be the right next step for a production rollout.
 - **Literal replacement, not `re.sub` template expansion.** Replacements run via `compiled.sub(lambda _: replacement, s)` so backreferences like `\1` and named groups are not expanded. This avoids surprising side effects when a user types a literal `\1`.
