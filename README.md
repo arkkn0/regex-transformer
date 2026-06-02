@@ -40,7 +40,7 @@ The fastest way to evaluate the deployed app is:
 
 Expected result: the reviewer can verify upload, LLM regex generation, server-side sample matching, literal replacement, transformed preview, and CSV download in under five minutes.
 
-## Take-home checklist
+## Checklist
 
 | Requirement | Implementation |
 | --- | --- |
