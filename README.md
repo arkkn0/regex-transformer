@@ -383,6 +383,15 @@ npm run build
 - Sample matches are computed by scanning at most `MAX_SAMPLE_SCAN_ROWS` rows (default 250). For very sparse columns, no sample match may be shown even though `apply` will still find matches across the full file.
 - The example dataset includes a single small CSV (`examples/sample_emails.csv`). No XLSX example is bundled.
 
+## Deployment checklist
+
+- Run `python manage.py test` from `backend/`.
+- Run `npm ci`, `npm run lint`, and `npm run build` from `frontend/`.
+- Set the production Django secret, allowed hosts, CORS origin, frontend API base URL, and model credentials in the hosting dashboards; do not upload a local `.env` file.
+- Run Django migrations before starting Gunicorn.
+- Keep one backend worker while uploads and exports use the in-memory store.
+- Smoke-test `/api/health/`, the sample CSV workflow, one-shot download, CORS, and HTTPS after deployment.
+
 ## 11. Appendix
 
 **Project structure**
