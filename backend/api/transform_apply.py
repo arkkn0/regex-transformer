@@ -2,34 +2,34 @@
 
 from __future__ import annotations
 
-import re
 from typing import Any
 
 import pandas as pd
+import regex
 from django.conf import settings
 
 FLAG_MAP: dict[str, int] = {
-    "IGNORECASE": re.IGNORECASE,
-    "MULTILINE": re.MULTILINE,
-    "DOTALL": re.DOTALL,
-    "VERBOSE": re.VERBOSE,
+    "IGNORECASE": regex.IGNORECASE,
+    "MULTILINE": regex.MULTILINE,
+    "DOTALL": regex.DOTALL,
+    "VERBOSE": regex.VERBOSE,
 }
 
-NESTED_QUANTIFIER_RE = re.compile(
+NESTED_QUANTIFIER_RE = regex.compile(
     r"\((?:[^()\\]|\\.)+[+*][^()]*\)[+*{]"
 )
-EMPTY_ALTERNATION_RE = re.compile(r"\(\||\|\)")
+EMPTY_ALTERNATION_RE = regex.compile(r"\(\||\|\)")
 FORMULA_PREFIXES = ("=", "+", "-", "@")
 
 
-def compile_regex(pattern: str, flag_names: list[str]) -> re.Pattern[str]:
+def compile_regex(pattern: str, flag_names: list[str]) -> regex.Pattern[str]:
     validate_regex_pattern(pattern)
     bits = 0
     for name in flag_names:
         if name not in FLAG_MAP:
             raise ValueError(f"Unknown regex flag: {name}")
         bits |= FLAG_MAP[name]
-    return re.compile(pattern, bits)
+    return regex.compile(pattern, bits)
 
 
 def validate_regex_pattern(pattern: str) -> None:
@@ -50,7 +50,7 @@ def validate_regex_pattern(pattern: str) -> None:
 def apply_regex_to_column(
     df: pd.DataFrame,
     column: str,
-    compiled: re.Pattern[str],
+    compiled: regex.Pattern[str],
     replacement: str,
 ) -> tuple[pd.DataFrame, int, int]:
     """
@@ -76,9 +76,18 @@ def apply_regex_to_column(
                 f"Column '{column}' contains a cell longer than {settings.MAX_CELL_CHARS} characters. "
                 "Shorten that cell or raise MAX_CELL_CHARS only if your deployment can process it safely."
             )
-        if compiled.search(s):
-            matched_cells += 1
-        new_s = compiled.sub(lambda _match: replacement, s)
+        try:
+            if compiled.search(s, timeout=settings.REGEX_TIMEOUT_SECONDS):
+                matched_cells += 1
+            new_s = compiled.sub(
+                lambda _match: replacement,
+                s,
+                timeout=settings.REGEX_TIMEOUT_SECONDS,
+            )
+        except TimeoutError as exc:
+            raise ValueError(
+                "Regular expression exceeded the execution time limit. Review or simplify it."
+            ) from exc
         if new_s != s:
             changed_rows += 1
         new_values.append(new_s)

@@ -6,14 +6,14 @@ Sample matches are computed locally against the stored column, never from the mo
 from __future__ import annotations
 
 import json
-import re
 from typing import Any
 
 import pandas as pd
+import regex
 from django.conf import settings
 from openai import OpenAI
 
-SYSTEM_PROMPT = """You propose a single Python `re` pattern from a user's goal.
+SYSTEM_PROMPT = """You propose a single Python-compatible regex pattern from a user's goal.
 Return one JSON object with exactly these keys:
 - "regex_pattern": string, usable with Python `re.compile()` (no embedded flag prefixes like (?i) unless truly needed).
 - "explanation": short plain-English line for an end user (keep under 400 characters).
@@ -57,7 +57,7 @@ def collect_prompt_samples(
 
 def collect_sample_matches(
     series: pd.Series,
-    compiled: re.Pattern[str],
+    compiled: regex.Pattern[str],
     *,
     limit: int = 10,
 ) -> list[dict[str, Any]]:
@@ -71,7 +71,15 @@ def collect_sample_matches(
             continue
         s = str(val)
         searchable = s[: settings.MAX_CELL_CHARS]
-        match = compiled.search(searchable)
+        try:
+            match = compiled.search(
+                searchable,
+                timeout=settings.REGEX_TIMEOUT_SECONDS,
+            )
+        except TimeoutError as exc:
+            raise ValueError(
+                "Regular expression exceeded the execution time limit. Review or simplify it."
+            ) from exc
         if not match:
             continue
         matched = match.group(0)

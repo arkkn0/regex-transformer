@@ -171,6 +171,30 @@ class RegexTransformerApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("too risky", response.json()["error"])
 
+    @override_settings(REGEX_TIMEOUT_SECONDS=0.000001)
+    def test_apply_aborts_regex_that_exceeds_execution_deadline(self):
+        adversarial_value = ("a" * 1500) + "!"
+        upload_response = self.client.post(
+            "/api/upload/",
+            {"file": csv_upload(f"ID,Value\n1,{adversarial_value}\n")},
+            format="multipart",
+        )
+
+        response = self.client.post(
+            "/api/transform/apply/",
+            {
+                "file_id": upload_response.json()["file_id"],
+                "column_name": "Value",
+                "regex_pattern": r"(a|aa)+$",
+                "replacement_value": "x",
+                "flags": [],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("execution time limit", response.json()["error"])
+
     @override_settings(OPENAI_API_KEY="test-key")
     @patch("api.views.call_llm_for_regex")
     def test_generate_pattern_validates_llm_output_and_returns_local_matches(self, mock_llm):
@@ -219,6 +243,34 @@ class RegexTransformerApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("no non-empty values", response.json()["error"])
         mock_llm.assert_not_called()
+
+    @override_settings(OPENAI_API_KEY="test-key", REGEX_TIMEOUT_SECONDS=0.000001)
+    @patch("api.views.call_llm_for_regex")
+    def test_generate_pattern_aborts_slow_sample_matching(self, mock_llm):
+        mock_llm.return_value = {
+            "regex_pattern": r"(a|aa)+$",
+            "explanation": "Potentially expensive expression.",
+            "warnings": [],
+        }
+        adversarial_value = ("a" * 1500) + "!"
+        upload_response = self.client.post(
+            "/api/upload/",
+            {"file": csv_upload(f"ID,Value\n1,{adversarial_value}\n")},
+            format="multipart",
+        )
+
+        response = self.client.post(
+            "/api/pattern/generate/",
+            {
+                "file_id": upload_response.json()["file_id"],
+                "column_name": "Value",
+                "natural_language_prompt": "Find the repeated a sequence.",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("execution time limit", response.json()["error"])
 
 
 class ParsingTests(TestCase):

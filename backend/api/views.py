@@ -1,6 +1,6 @@
 import io
-import re
 
+import regex
 from django.conf import settings
 from django.http import FileResponse
 from rest_framework import status
@@ -127,16 +127,16 @@ def generate_pattern(request):
 
     try:
         validate_regex_pattern(pattern_str)
-        compiled = re.compile(pattern_str)
+        compiled = regex.compile(pattern_str)
     except ValueError as exc:
         return Response(
             {"error": str(exc)},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    except re.error as exc:
+    except regex.error as exc:
         return Response(
             {
-                "error": "The model returned an invalid regular expression. It cannot be compiled with Python's re module.",
+                "error": "The model returned an invalid regular expression.",
                 "detail": str(exc),
             },
             status=status.HTTP_400_BAD_REQUEST,
@@ -145,7 +145,13 @@ def generate_pattern(request):
     if not explanation:
         explanation = "Pattern generated from your description."
 
-    sample_matches = collect_sample_matches(series, compiled)
+    try:
+        sample_matches = collect_sample_matches(series, compiled)
+    except ValueError as exc:
+        return Response(
+            {"error": str(exc)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     return Response(
         {
@@ -196,10 +202,10 @@ def apply_transform(request):
             {"error": str(exc)},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    except re.error as exc:
+    except regex.error as exc:
         return Response(
             {
-                "error": "Invalid regular expression. It cannot be compiled with Python's re module.",
+                "error": "Invalid regular expression.",
                 "detail": str(exc),
             },
             status=status.HTTP_400_BAD_REQUEST,
