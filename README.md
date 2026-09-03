@@ -54,12 +54,13 @@ The React frontend handles upload, column selection, expression review, transfor
 - Uploads are restricted to CSV or XLSX and bounded by byte, row and column limits.
 - Prompt samples are deduplicated, length-limited and capped; the full table is not sent to the model.
 - Generated and edited expressions are checked for length, invalid syntax, nested quantifiers and empty alternations.
+- Every server-side search and replacement has a hard execution deadline, including preview matching, so a pattern that passes static checks still cannot consume a worker indefinitely.
 - Replacement strings are literal, so user input cannot invoke regex backreferences.
 - Long target cells are rejected before applying a transformation instead of being silently truncated.
 - CSV values beginning with `=`, `+`, `-` or `@` are escaped before export.
 - Uploaded tables and generated exports expire from the in-memory stores; downloads are one-time.
 
-Python's `re` engine cannot guarantee a time limit for every adversarial expression. The current checks reduce common risks but are not a complete defence against catastrophic backtracking. A service accepting arbitrary public traffic should use an engine with hard execution limits or isolate matching in a resource-constrained worker.
+The timeout is enforced per cell. A public high-volume deployment should additionally isolate matching in resource-constrained workers and enforce request-level quotas.
 
 ## Local development
 
@@ -141,6 +142,7 @@ The main environment variables are listed in [`.env.example`](.env.example).
 | `MAX_UPLOAD_COLUMNS` | `100` | Parsed column limit |
 | `MAX_CELL_CHARS` | `2000` | Apply-path cell length limit |
 | `MAX_REGEX_PATTERN_LENGTH` | `500` | Expression length limit |
+| `REGEX_TIMEOUT_SECONDS` | `0.05` | Per-search and per-replacement execution deadline |
 | `UPLOAD_STORE_TTL_SECONDS` | `3600` | Upload retention in memory |
 
 For a deployed backend, set a unique `DJANGO_SECRET_KEY`, disable debug mode, and configure `DJANGO_ALLOWED_HOSTS` and `CORS_ALLOWED_ORIGINS`. Set `VITE_API_BASE_URL` when the built frontend and backend use different origins.
